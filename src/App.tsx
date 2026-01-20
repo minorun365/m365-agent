@@ -211,7 +211,7 @@ function App() {
       <header className="header">
         <div className="header-left"></div>
         <div className="header-center">
-          <h1 className="title">あなただけの秘書AIエージェント（Lite版）</h1>
+          <h1 className="title">あなただけの秘書AIエージェント</h1>
           <p className="subtitle">AmplifyとAgentCoreでフルサーバーレス構築しています</p>
         </div>
         <div className="header-right">
