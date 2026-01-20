@@ -1,0 +1,8 @@
+botocore
+bedrock-agentcore
+httpx
+atlassian-python-api
+
+strands-agents
+strands-agents[otel]
+strands-agents-tools[rss]

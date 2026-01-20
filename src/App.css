@@ -1,0 +1,145 @@
+/* タイトルバー（フォームと同じテイスト） */
+.header {
+  background: linear-gradient(135deg, #ea580c 0%, #ef4444 100%);
+  color: #fff;
+  padding: 16px 24px;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-left, .header-right {
+  flex: 0 0 160px;
+}
+.header-center {
+  text-align: center;
+}
+.header-right {
+  text-align: right;
+}
+.title { font-size: 1.25rem; font-weight: 600; margin: 0; }
+.subtitle { font-size: 0.85rem; opacity: 0.9; margin: 4px 0 0; }
+
+/* コンテナ */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  background: #fafbfc;
+}
+
+/* メッセージ表示エリア */
+.message-area {
+  flex: 1;
+  overflow: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* メッセージ行 */
+.message-row {
+  display: flex;
+  margin-bottom: 12px;
+}
+.message-row.user { justify-content: flex-end; }
+.message-row.assistant { justify-content: flex-start; }
+
+/* メッセージバブル */
+.bubble {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+.bubble.user {
+  background: linear-gradient(135deg, #ea580c 0%, #ef4444 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.25);
+}
+.bubble.assistant {
+  background: #fff;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* 思考中・ツール使用中 */
+.thinking { color: #9ca3af; font-style: italic; }
+.tool-status { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+.tool-status.active { color: #ea580c; }
+.tool-status.completed { color: #10b981; }
+
+/* 入力フォーム */
+.form-wrapper {
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  padding: 16px 24px;
+}
+.form {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+  outline: none;
+}
+.input:focus {
+  border-color: #475569;
+  box-shadow: 0 0 0 3px rgba(71, 85, 105, 0.15);
+}
+.button {
+  padding: 12px 28px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #475569 0%, #334155 100%);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(71, 85, 105, 0.3);
+}
+.button:hover { transform: translateY(-1px); }
+.button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* Outlook 連携ボタン */
+.outlook-button {
+  padding: 8px 20px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.outlook-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+}
+.outlook-button.connected {
+  background: rgba(71, 85, 105, 0.4);
+  border-color: rgba(71, 85, 105, 0.6);
+}
+.outlook-button.connected:hover {
+  background: rgba(71, 85, 105, 0.55);
+  border-color: rgba(71, 85, 105, 0.75);
+}
+.outlook-button:disabled {
+  cursor: default;
+}
