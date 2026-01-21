@@ -720,10 +720,9 @@ async def invoke_agent(payload, context):
     else:
         # 新しいAgentを作成
         # Bedrock の Claude モデルを使用
-        # 重要: リージョンを明示的に指定（デフォルトだと ap-northeast-1 になる）
         bedrock_model = BedrockModel(
-            # model_id="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
-            model_id="us.anthropic.claude-haiku-4-5-20251001-v1:0",
+            model_id="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+            # model_id="us.anthropic.claude-haiku-4-5-20251001-v1:0",
             region_name="us-east-1"
         )
         agent = Agent(
