@@ -2,8 +2,6 @@
 
 チャットで依頼すると、AIエージェントが **Outlook**・**Microsoft To Do**・**Confluence** を操作してくれる秘書アプリです。
 
-![Architecture](https://github.com/user-attachments/assets/placeholder)
-
 ## できること
 
 - **Outlook カレンダー** ... 予定の参照、会議の作成（参加者への招待メール送信）
@@ -11,6 +9,8 @@
 - **Confluence** ... ページの取得・検索・作成・更新
 
 ## 技術スタック
+
+![Architecture](docs/architecture.png)
 
 | レイヤー | 技術 |
 |----------|------|
