@@ -8,9 +8,11 @@
 - **Microsoft To Do** ... タスクの一覧取得、作成、更新、完了
 - **Confluence** ... ページの取得・検索・作成・更新
 
+![sample](docs/sample.png)
+
 ## 技術スタック
 
-![Architecture](docs/architecture.png)
+![architecture](docs/architecture.png)
 
 | レイヤー | 技術 |
 |----------|------|
