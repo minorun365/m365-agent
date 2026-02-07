@@ -1,6 +1,6 @@
 # M365 Agent - あなただけの秘書AIエージェント
 
-チャットで依頼すると、AIエージェントが **Outlook**・**Microsoft To Do**・**Confluence** を操作してくれる秘書アプリです。
+チャットで依頼すると、AIエージェントがOutlook、Microsoft To Do、Confluenceを操作してくれる秘書アプリです。
 
 ## できること
 
