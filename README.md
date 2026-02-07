@@ -69,12 +69,3 @@ npm run dev
 
 GitHub にプッシュすると Amplify Hosting が自動デプロイします。
 環境変数は Amplify コンソールで設定してください。
-
-## ドキュメント
-
-- [docs/development.md](./docs/development.md) - 開発ガイド（環境構築の詳細手順）
-- [docs/knowledge.md](./docs/knowledge.md) - 開発で学んだ教訓・Tips
-
-## ライセンス
-
-[MIT](./LICENSE)
