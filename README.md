@@ -2,11 +2,13 @@
 
 チャットで依頼すると、AIエージェントがOutlook、Microsoft To Do、Confluenceを操作してくれる秘書アプリです。
 
-## できること
+## 主な機能
 
-- **Outlook カレンダー** ... 予定の参照、会議の作成（参加者への招待メール送信）
-- **Microsoft To Do** ... タスクの一覧取得、作成、更新、完了
-- **Confluence** ... ページの取得・検索・作成・更新
+| サービス | 操作 |
+|---|---|
+| Outlook カレンダー | 予定の参照、会議の作成と招待メールの送信 |
+| Microsoft To Do | タスクの一覧、作成、更新、完了 |
+| Confluence | ページの取得、検索、作成、更新 |
 
 ![sample](docs/sample.png)
 
