@@ -2,11 +2,11 @@
 
 ## ゴール
 
-Web アプリにログインしたユーザーがチャットで依頼すると、AI エージェントが **Outlook（Microsoft Graph）** と **Confluence** を操作して次を実行する。
+Web アプリにログインしたユーザーがチャットで依頼すると、AI エージェントが Outlook（Microsoft Graph）と Confluence を操作して次の処理を実行します。
 
 ### Outlook 機能
 * ✅ 予定参照（指定期間の予定一覧）
-* ✅ 会議作成（Outlook カレンダーにイベント作成 + 参加者招待）
+* ✅ 会議作成（Outlook カレンダーへのイベント作成と参加者招待）
 
 ### Confluence 機能
 * ✅ ページ取得（指定IDのページ内容を取得）
@@ -14,7 +14,7 @@ Web アプリにログインしたユーザーがチャットで依頼すると�
 * ✅ ページ作成（新規ページを作成）
 * ✅ ページ更新（既存ページを更新）
 
-**採用スタック（固定）**
+採用スタック（固定）
 
 * フロント：React + Vite（Amplify Gen2）
 * 認証：Amplify Auth（Cognito / メール認証）
@@ -30,16 +30,15 @@ Web アプリにログインしたユーザーがチャットで依頼すると�
 
 ### M365 Personal（個人 Microsoft アカウント）でできる
 
-* `Calendars.Read` / `Calendars.ReadWrite` を Delegated で取得して、
+* `Calendars.Read` / `Calendars.ReadWrite` を Delegated で取得すると、次の操作ができる
 
   * 予定参照（`/me/calendarView`）
   * 予定作成（`/me/events`）
-    ができる
 
 ### M365 Personal で厳しい / 非対応になりがち
 
-* **Teams のオンライン会議 URL 自動生成**（`/me/onlineMeetings` など）は “personal Microsoft account は非対応” になりやすい
-  → Teams URL まで PoC 要件なら、後述の「M365 Developer Program（E5 Sandbox）」か「Business Starter」を推奨
+* Teams のオンライン会議 URL 自動生成（`/me/onlineMeetings` など）は、personal Microsoft account では非対応になりやすい
+  → Teams URL まで PoC 要件に含める場合は、後述の「M365 Developer Program（E5 Sandbox）」か「Business Starter」を推奨
 
 ---
 
@@ -47,15 +46,14 @@ Web アプリにログインしたユーザーがチャットで依頼すると�
 
 * Cognito ログイン：アプリ利用の認証
 * Microsoft ログイン（MSAL）：Outlook 操作用の Graph Access Token を取得
-* フロントは AgentCore Runtime にリクエストする際、
+* フロントは AgentCore Runtime にリクエストする際、次の情報を送る
 
   * `Authorization: Bearer {Cognito Access Token}`（AgentCore の Inbound JWT 用）
-  * body に `msGraphAccessToken` を同梱（Graph 用）
-    を送る
+  * body に同梱した `msGraphAccessToken`（Graph 用）
 * AgentCore Runtime 側の Strands tool が Graph を呼ぶ
 
-> 本番では「Graph Token をフロントから送る」のは避けたいが、PoC 最短はこれが爆速です。
-> 本番寄りにする場合は後半の「次のステップ（AgentCore Identity / Outbound Auth）」へ。
+> 本番では Graph Token をフロントから送る構成は避けたいものの、PoC を最短で組むならこの方法がもっとも速いです。
+> 本番に近い構成にする場合は、後半の「次のステップ（AgentCore Identity / Outbound Auth）」を参照してください。
 
 ---
 
@@ -63,9 +61,9 @@ Web アプリにログインしたユーザーがチャットで依頼すると�
 
 ## あなたがやる
 
-* [ ] AWS アカウント準備（バージニア北部を使う）
-* [ ] Bedrock で Claude などモデル有効化
-* [ ] M365 アカウント準備（Personal でOK）
+* [ ] AWS アカウントの準備（バージニア北部を使う）
+* [ ] Bedrock で Claude などのモデルを有効化
+* [ ] M365 アカウントの準備（Personal でOK）
 * [ ] Entra（アプリ登録）用のテナント準備（Personal でも作成可能）
 * [ ] Qiita ベース（cdk-agent）リポジトリを用意（fork/clone）
 
@@ -84,20 +82,20 @@ Web アプリにログインしたユーザーがチャットで依頼すると�
 ### A. 最短（おすすめ）：M365 Personal + Entra で “アプリ登録だけ” 作る
 
 * 予定参照・予定作成はこの構成で十分
-* Teams URL 自動生成は割り切り（やらない）
+* Teams URL の自動生成は割り切って対応しない
 
 ---
 
 ## 1-2. Entra テナントを用意する（M365 Personal の場合）
 
-M365 Personal には「組織テナント管理（M365 管理センター）」が標準で付くわけではないので、**アプリ登録のための Entra テナント**を作ります。
+M365 Personal には「組織テナント管理（M365 管理センター）」が標準で付いているわけではないため、アプリ登録のための Entra テナントを作ります。
 
 ### 手順（概要）
 
 1. Azure / Entra にサインイン（個人 Microsoft アカウントでOK）
 2. Microsoft Entra ID から Tenant を作成（Workforce）
 
-> 画面の導線は変わりやすいので、詰まったら「Entra create tenant」で検索して同名画面を探すのが最短です。
+> 画面の導線は変わりやすいため、詰まったら「Entra create tenant」で検索して同名の画面を探すのが最短です。
 
 ---
 
@@ -105,33 +103,33 @@ M365 Personal には「組織テナント管理（M365 管理センター）」�
 
 ### あなたがやる（Entra 管理センター）
 
-1. **App registrations** → **New registration**
+1. App registrations → New registration
 2. Name：`outlook-agent`
 3. Supported account types（おすすめ）
 
    * PoC を Personal でも組織でも動かしたい：
-     **Accounts in any organizational directory and personal Microsoft accounts**
+     Accounts in any organizational directory and personal Microsoft accounts
    * Personal だけでいい：
-     **Personal Microsoft accounts**
+     Personal Microsoft accounts
 4. Redirect URI（SPA）
 
    * ローカル（Vite）：`http://localhost:5173/`
    * 本番（Amplify）：`https://<Amplifyのドメイン>/`
 
-> Redirect URI は “完全一致” なので、末尾スラッシュあり/なしをコードと一致させること。
+> Redirect URI は完全一致で判定されるため、末尾スラッシュのあり/なしをコードと一致させてください。
 
-5. 作成後、Overview から控える
+5. 作成後、Overview から以下を控える
 
-   * **Application (client) ID**（= clientId）: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
-   * （必要なら）Directory (tenant) ID: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+   * Application (client) ID（= clientId）: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+   * Directory (tenant) ID（必要なら）: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
 
 ---
 
 ## 1-4. Authentication 設定（SPA）
 
-App registrations → Authentication で以下を確認：
+App registrations → Authentication で以下を確認します。
 
-* Platform: **Single-page application**
+* Platform: Single-page application
 * Redirect URI が入っていること
 
 ---
@@ -144,7 +142,7 @@ App registrations → API permissions → Add a permission → Microsoft Graph �
 
 * `User.Read`
 * `Calendars.ReadWrite`
-* （推奨）`offline_access`（サイレント更新が安定しやすい）
+* `offline_access`（推奨。サイレント更新が安定しやすい）
 
 > 組織テナントの場合、環境によっては "Grant admin consent" が必要です。
 
@@ -159,11 +157,11 @@ App registrations → API permissions → Add a permission → Microsoft Graph �
 3. ラベルを入力（例: `outlook-agent`）
 4. 生成されたトークンをコピー
 
-> **注意**: 「API Key」（admin.atlassian.com で発行）ではなく「API Token」を使用すること
+> 注意：admin.atlassian.com で発行する「API Key」ではなく、「API Token」を使用してください。
 
 ### 環境変数の設定
 
-`.env.local` に追加：
+`.env.local` に以下を追加します。
 
 ```bash
 CONFLUENCE_URL=https://your-domain.atlassian.net
@@ -172,7 +170,7 @@ CONFLUENCE_API_TOKEN=発行したトークン
 CONFLUENCE_DEFAULT_SPACE_KEY=~xxxxxxxxxxxxxxxxxxxxxxxx  # スペースキー（URLから確認）
 ```
 
-> **スペースキーの確認方法**: ConfluenceのページURLに含まれる `spaces/【ここ】/pages/...` の部分がスペースキーです。個人スペースは `~` で始まります。
+> スペースキーの確認方法：Confluence のページ URL に含まれる `spaces/【ここ】/pages/...` の部分がスペースキーです。個人スペースは `~` で始まります。
 
 ### sandbox 起動時
 
@@ -183,7 +181,7 @@ export $(cat .env.local | grep CONFLUENCE | xargs) && npx ampx sandbox
 
 ### 本番デプロイ時
 
-Amplify コンソール → 環境変数 に以下を設定：
+Amplify コンソール → 環境変数に以下を設定します。
 - `CONFLUENCE_URL`
 - `CONFLUENCE_EMAIL`
 - `CONFLUENCE_API_TOKEN`
@@ -195,7 +193,7 @@ Amplify コンソール → 環境変数 に以下を設定：
 
 ## 2-1. ベースを用意
 
-あなたの Qiita ベースを流用（この URL の手順/構成を前提）：
+あなたの Qiita ベースを流用します（以下の URL の手順・構成が前提です）。
 
 ```text
 https://qiita.com/minorun365/items/0b4a980f2f4bb073a9e0
@@ -204,8 +202,8 @@ https://qiita.com/minorun365/items/0b4a980f2f4bb073a9e0
 ### このベースに最初からあるもの（重要）
 
 * Amplify Gen2 + Cognito（メール認証）
-* AgentCore Runtime（JWT authorizer が Cognito）
-* Strands Agent（`agent.stream_async()` を SSE でフロントへ）
+* AgentCore Runtime（JWT authorizer は Cognito）
+* Strands Agent（`agent.stream_async()` を SSE でフロントへ送信）
 
 ---
 
@@ -215,7 +213,7 @@ https://qiita.com/minorun365/items/0b4a980f2f4bb073a9e0
 
 ### ローカル用（Vite）
 
-`/.env.local` を作成：
+`/.env.local` を作成します。
 
 ```bash
 VITE_MS_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -231,7 +229,7 @@ https://login.microsoftonline.com/consumers
 
 ### Amplify 本番用
 
-Amplify コンソールの **Environment variables（ビルド時）** に同じ `VITE_MS_CLIENT_ID` / `VITE_MS_AUTHORITY` を設定して再デプロイ。
+Amplify コンソールの Environment variables（ビルド時）に同じ `VITE_MS_CLIENT_ID` と `VITE_MS_AUTHORITY` を設定し、再デプロイします。
 
 ---
 
@@ -294,7 +292,7 @@ export function pickAccount(): AccountInfo | null {
 ### `src/App.tsx` の変更方針
 
 * 既存の Cognito ログインはそのまま
-* 画面上部に **Connect Outlook** ボタンを追加
+* 画面上部に Connect Outlook ボタンを追加
 * `handleSubmit` の payload に以下を追加
 
   * `msGraphAccessToken`
@@ -309,7 +307,7 @@ export function pickAccount(): AccountInfo | null {
 #### Token の取り方（例）
 
 * `loginPopup` で初回連携
-* 送信直前は `acquireTokenSilent` → ダメなら `acquireTokenPopup`
+* 送信直前は `acquireTokenSilent` を呼び、失敗したら `acquireTokenPopup` にフォールバック
 
 ---
 
@@ -326,11 +324,11 @@ httpx
 ### `amplify/agent/app.py` の変更方針
 
 * payload から `msGraphAccessToken`, `userTimeZone`, `clientNowIso` を受ける
-* `msGraphAccessToken` が無ければ「Connect Outlook を促す」だけ返す
+* `msGraphAccessToken` が無ければ「Connect Outlook を促す」応答だけを返す
 * Graph 操作は Strands tools（Python 関数）に閉じ込める
 
   * 重要：**トークンを tool の引数にしない**（LLM に見せない）
-  * closure / ローカル変数として保持して、http header にだけ付ける
+  * closure やローカル変数として保持し、http header にだけ付ける
 
 ### 用意するツール（最小）
 
@@ -339,7 +337,7 @@ httpx
 * `create_meeting(subject, start_iso, end_iso, attendees, body="")`
   → `POST /me/events`
 
-> PoC では「参加者は email を要求する」で割り切ると実装が一気に簡単です（名前解決・連絡先検索を後回しにできる）。
+> PoC では参加者を email 指定に割り切ると、名前解決や連絡先検索を後回しにでき、実装がずっと簡単になります。
 
 ---
 
@@ -362,8 +360,8 @@ GET /me/calendarView?startDateTime=...&endDateTime=...
 実務ポイント：
 
 * `Prefer: outlook.timezone="Asia/Tokyo"` を付けると見やすい
-* `startDateTime/endDateTime` にタイムゾーン無しを渡すと UTC 解釈されやすい
-  → PoC は ISO に `+09:00` を付けるか、UTC（Z）に揃えるのが安全
+* `startDateTime/endDateTime` にタイムゾーン無しを渡すと UTC として解釈されやすい
+  → PoC では ISO に `+09:00` を付けるか、UTC（Z）に揃えるのが安全
 
 ### 会議作成（イベント作成）
 
@@ -371,8 +369,8 @@ GET /me/calendarView?startDateTime=...&endDateTime=...
 POST /me/events
 ```
 
-* attendees を含めると Outlook 側で招待メールが飛ぶ挙動になりがち（抑制しにくい）
-  → PoC は「招待が飛ぶ」前提でOK
+* attendees を含めると Outlook 側で招待メールが送られやすく、抑制しにくい
+  → PoC は招待が飛ぶ前提で進めて問題ない
 
 ---
 
@@ -453,7 +451,7 @@ npx cdk bootstrap aws://$ACCOUNT_ID/ap-northeast-1
 ## 「Teams 会議リンク作って」が失敗する
 
 * M365 Personal だとオンライン会議 API が使えない場合がある
-  → Teams URL が必要なら “work/school テナント” に切り替える（Developer Program / Business）
+  → Teams URL が必要なら、work/school テナント（Developer Program / Business）に切り替える
 
 ---
 
@@ -469,7 +467,7 @@ npx cdk bootstrap aws://$ACCOUNT_ID/ap-northeast-1
 
 * Graph Token をフロントから渡すのをやめる
 
-  * AgentCore Identity の **Outbound Auth / Credential Provider** で 3LO を扱う
+  * AgentCore Identity の Outbound Auth / Credential Provider で 3LO を扱う
 * 予定の更新/キャンセル、参加者の応答取得
 * work account で Teams オンライン会議（URL自動生成）
 * AgentCore Memory を入れて「文脈記憶」対応
@@ -483,7 +481,7 @@ npx cdk bootstrap aws://$ACCOUNT_ID/ap-northeast-1
 
 * `@azure/msal-browser` を追加
 * `src/msal.ts` を新規作成（initialize を含める）
-* `src/App.tsx` に Connect Outlook ボタン
+* `src/App.tsx` に Connect Outlook ボタンを追加
 * `handleSubmit` の payload に `msGraphAccessToken/userTimeZone/clientNowIso` を追加
 
 ## バック
@@ -495,4 +493,4 @@ npx cdk bootstrap aws://$ACCOUNT_ID/ap-northeast-1
 
 ---
 
-必要なら、このガイドのまま **「実際に `src/App.tsx` と `amplify/agent/app.py` の“差分パッチ（diff）”」**も作って貼ります（Qiitaベースのコードにそのまま当てられる形）。
+必要なら、このガイドに沿って `src/App.tsx` と `amplify/agent/app.py` の差分パッチ（diff）も作って貼ります。Qiita ベースのコードにそのまま当てられる形です。

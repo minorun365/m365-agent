@@ -51,12 +51,12 @@
 
 | ファイル | 役割 |
 |----------|------|
-| `index.html` | SPAエントリーポイント（`<div id="root">`） |
-| `src/main.tsx` | Amplify初期化、Cognito認証ラッパー、日本語化、Reactレンダリング |
-| `src/App.tsx` | メインUIコンポーネント（チャット画面全体） |
-| `src/msal.ts` | MSAL設定・初期化・トークン管理のユーティリティ |
-| `src/App.css` | チャットUI用スタイル |
-| `src/index.css` | グローバルスタイル（リセット、フォント） |
+| `index.html` | SPAのエントリーポイント（`<div id="root">`） |
+| `src/main.tsx` | Amplifyの初期化、Cognito認証ラッパー、日本語化、Reactのレンダリング |
+| `src/App.tsx` | チャット画面全体のメインUIコンポーネント |
+| `src/msal.ts` | MSALの設定・初期化・トークン管理のユーティリティ |
+| `src/App.css` | チャットUI用のスタイル |
+| `src/index.css` | リセットやフォントなどのグローバルスタイル |
 
 ### 2.2 画面構成
 
@@ -81,17 +81,17 @@
 
 ### 2.3 状態管理
 
-`App.tsx` で管理する状態（useState）:
+`App.tsx` では `useState` を使って次の状態を管理する。
 
 | 状態変数 | 型 | 初期値 | 用途 |
 |----------|------|--------|------|
 | `messages` | `Message[]` | `[]` | チャット履歴 |
 | `input` | `string` | `''` | 入力フィールドの値 |
-| `loading` | `boolean` | `false` | 送信中フラグ（二重送信防止） |
+| `loading` | `boolean` | `false` | 二重送信を防ぐための送信中フラグ |
 | `msConnected` | `boolean` | `false` | Entra ID接続状態 |
 | `msGraphAccessToken` | `string \| null` | `null` | Graph APIアクセストークン |
 
-`Message` 型定義:
+`Message` 型は次のように定義する。
 
 ```typescript
 interface Message {
@@ -104,16 +104,16 @@ interface Message {
 }
 ```
 
-セッションID（useRef）:
-- `sessionIdRef` - `crypto.randomUUID()` で画面ロード時に1回生成
-- リロードで新しいセッションになる（AgentCore側の会話履歴がリセット）
+セッションIDは `useRef` で管理する。
+- `sessionIdRef` は画面ロード時に `crypto.randomUUID()` で1回生成する
+- リロードすると新しいセッションになり、AgentCore側の会話履歴はリセットされる
 
 ### 2.4 認証フロー
 
 #### Cognito認証（アプリ利用）
-- `main.tsx` で `<Authenticator>` コンポーネントがアプリ全体をラップ
-- メールアドレス + パスワードによるサインアップ/サインイン
-- `I18n` で日本語化済み
+- `main.tsx` で `<Authenticator>` コンポーネントを使い、アプリ全体をラップする
+- メールアドレスとパスワードでサインアップ・サインインする
+- `I18n` で日本語化している
 
 #### Microsoft Entra ID認証（M365連携）
 
@@ -135,15 +135,15 @@ interface Message {
 2. 失敗した場合: acquireTokenPopup() でユーザーに再認証を促す
 ```
 
-Graph APIに要求するスコープ:
-- `User.Read` - ユーザー情報の読み取り
-- `Calendars.ReadWrite` - カレンダーの読み書き
-- `Tasks.ReadWrite` - To Doタスクの読み書き
-- `offline_access` - リフレッシュトークンの取得
+Graph APIには次のスコープを要求する。
+- `User.Read`: ユーザー情報の読み取り
+- `Calendars.ReadWrite`: カレンダーの読み書き
+- `Tasks.ReadWrite`: To Doタスクの読み書き
+- `offline_access`: リフレッシュトークンの取得
 
-MSAL設定:
-- キャッシュ: `sessionStorage`（ブラウザを閉じると消える）
-- リダイレクトURI: `window.location.origin`（Entra側の登録と完全一致が必要）
+MSALは次のように設定している。
+- キャッシュには `sessionStorage` を使い、ブラウザを閉じると消える
+- リダイレクトURIには `window.location.origin` を指定しており、Entra側の登録と完全に一致させる必要がある
 
 ### 2.5 メッセージ送信・SSEストリーミング処理
 
@@ -166,8 +166,8 @@ Body:
   }
 ```
 
-- `AGENT_ARN` は `amplify_outputs.json` の `custom.agentRuntimeArn` から取得
-- `clientNowIso` は `sv-SE` ロケールでフォーマット（ISO 8601互換の `YYYY-MM-DDTHH:mm:ss`）
+- `AGENT_ARN` は `amplify_outputs.json` の `custom.agentRuntimeArn` から取得する
+- `clientNowIso` は `sv-SE` ロケールでフォーマットし、ISO 8601互換の `YYYY-MM-DDTHH:mm:ss` 形式にする
 
 #### レスポンス（SSEストリーミング）
 
@@ -206,7 +206,7 @@ ReadableStream から chunk を読み取り
 
 ### 3.1 エントリーポイント (`app.py`)
 
-`BedrockAgentCoreApp` を使用し、`@app.entrypoint` デコレータでエントリーポイントを定義。
+`BedrockAgentCoreApp` を使い、`@app.entrypoint` デコレータでエントリーポイントを定義する。
 
 ```python
 @app.entrypoint
@@ -223,10 +223,10 @@ async def invoke_agent(payload, context):
 _agent_cache: dict[str, Agent] = {}
 ```
 
-- セッションIDをキーに `Agent` インスタンスをキャッシュ
-- 同じセッションIDで呼ばれると同じmicroVMが再利用される（AgentCoreの仕組み）
-- Agentインスタンスを再利用することで `agent.messages`（会話履歴）が保持される
-- トークンが変わる可能性があるため、再利用時もツールは毎回再生成
+- セッションIDをキーにして `Agent` インスタンスをキャッシュする
+- AgentCoreの仕組みにより、同じセッションIDで呼ばれると同じmicroVMが再利用される
+- Agentインスタンスを再利用することで、会話履歴である `agent.messages` が保持される
+- トークンが変わる可能性があるため、再利用時もツールは毎回再生成する
 
 ### 3.3 Strands Agent 構成
 
@@ -241,7 +241,7 @@ Agent(
 )
 ```
 
-ストリーミング実行:
+ストリーミング実行は次のように行う。
 ```python
 async for event in agent.stream_async(prompt):
     converted = convert_event(event)
@@ -251,13 +251,13 @@ async for event in agent.stream_async(prompt):
 
 ### 3.4 ツール一覧
 
-ツールはすべてクロージャパターンで生成。トークンや認証情報をLLMに見せず、HTTPヘッダーにのみ使用する。
+ツールはすべてクロージャパターンで生成する。トークンや認証情報はHTTPヘッダーだけに使い、LLMには見せない。
 
 #### Graph API ツール（`create_graph_tools()`）
 
 | ツール名 | 引数 | 機能 |
 |----------|------|------|
-| `get_current_datetime` | なし | 現在の日時と曜日を取得（ユーザーのタイムゾーン準拠） |
+| `get_current_datetime` | なし | ユーザーのタイムゾーンに準拠した現在の日時と曜日を取得 |
 | `get_schedule` | `start_iso`, `end_iso` | 指定期間の予定一覧を取得（`GET /me/calendarView`） |
 | `create_meeting` | `subject`, `start_iso`, `end_iso`, `attendees`, `body?` | 会議を作成し参加者に招待を送信（`POST /me/events`） |
 
@@ -277,10 +277,10 @@ async for event in agent.stream_async(prompt):
 |----------|------|------|
 | `get_confluence_page` | `page_id` | ページの内容を取得 |
 | `search_confluence` | `query`, `space_key?`, `limit?` | CQLでコンテンツを検索 |
-| `create_confluence_page` | `title`, `body`, `space_key?`, `parent_id?` | 新しいページを作成（HTML形式） |
+| `create_confluence_page` | `title`, `body`, `space_key?`, `parent_id?` | HTML形式で新しいページを作成 |
 | `update_confluence_page` | `page_id`, `title`, `body` | 既存のページを更新 |
 
-Confluence ツールは環境変数（`CONFLUENCE_URL`, `CONFLUENCE_EMAIL`, `CONFLUENCE_API_TOKEN`）が未設定の場合、空リストを返して機能を無効化する。`atlassian-python-api` ライブラリを使用。
+Confluence ツールは、環境変数 `CONFLUENCE_URL`、`CONFLUENCE_EMAIL`、`CONFLUENCE_API_TOKEN` が未設定の場合、空リストを返して機能を無効化する。実装には `atlassian-python-api` ライブラリを使う。
 
 ### 3.5 システムプロンプト
 
@@ -300,7 +300,7 @@ Confluence ツールは環境変数（`CONFLUENCE_URL`, `CONFLUENCE_EMAIL`, `CON
 
 ### 3.6 イベント変換 (`convert_event()`)
 
-Strands Agentの内部イベントをフロント向けJSONに変換:
+Strands Agentの内部イベントをフロント向けJSONに変換する。
 
 | Strandsイベント | 変換後 | 説明 |
 |----------------|--------|------|
@@ -318,11 +318,11 @@ FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 CMD ["opentelemetry-instrument", "python", "-m", "app"]
 ```
 
-ポート:
-- `8080` - AgentCore Runtimeのメインポート
-- `8000` - （予備）
+次のポートを使用する。
+- `8080`: AgentCore Runtimeのメインポート
+- `8000`: 予備
 
-ヘルスチェック: `curl -f http://localhost:8080/ping`
+ヘルスチェックには `curl -f http://localhost:8080/ping` を使用する。
 
 ## 4. IaC設計
 
@@ -344,15 +344,15 @@ Amplify Backend
 
 ### 4.2 AgentCore Runtime リソース (`agent/resource.ts`)
 
-- **イメージビルド**: `deploy-time-build` の `ContainerImageBuild` でCodeBuild上でARM64 Dockerイメージをビルド
-- **ランタイム名**: `outlook_agent_{envId}`（スタック名から環境識別子を抽出、英数字のみ）
-- **認証**: `RuntimeAuthorizerConfiguration.usingCognito()` でCognito User PoolとClientを紐付け
-- **ネットワーク**: `RuntimeNetworkConfiguration.usingPublicNetwork()` でパブリックアクセス
-- **IAM権限**: `bedrock:InvokeModel` と `bedrock:InvokeModelWithResponseStream`（全モデル・推論プロファイル対象）
+- イメージビルドでは、`deploy-time-build` の `ContainerImageBuild` を使ってCodeBuild上でARM64のDockerイメージをビルドする
+- ランタイム名は `outlook_agent_{envId}` とし、スタック名から抽出した英数字のみの環境識別子を入れる
+- 認証は `RuntimeAuthorizerConfiguration.usingCognito()` でCognito User PoolとClientを紐付ける
+- ネットワークは `RuntimeNetworkConfiguration.usingPublicNetwork()` でパブリックアクセスにする
+- IAM権限は全モデル・推論プロファイルを対象に、`bedrock:InvokeModel` と `bedrock:InvokeModelWithResponseStream` を付与する
 
 ### 4.3 出力値
 
-`backend.addOutput()` で `agentRuntimeArn` をフロントに公開:
+`backend.addOutput()` で `agentRuntimeArn` をフロントに公開する。
 ```json
 {
   "custom": {
@@ -360,7 +360,7 @@ Amplify Backend
   }
 }
 ```
-→ `amplify_outputs.json` に書き出され、フロントで参照される。
+この値は `amplify_outputs.json` に書き出され、フロントで参照される。
 
 ## 5. デプロイ
 
@@ -374,19 +374,19 @@ export $(cat .env.local | grep CONFLUENCE | xargs) && npx ampx sandbox
 npm run dev
 ```
 
-`amplify_outputs.json` がSandbox実行で自動生成される。
+Sandboxを実行すると `amplify_outputs.json` が自動生成される。
 
 ### 5.2 本番デプロイ（Amplify Hosting）
 
-`amplify.yml` で定義:
-1. **バックエンド**: `npm ci` → `npx ampx pipeline-deploy`
-2. **フロントエンド**: `npm run build` → `dist/` を配信
+デプロイ手順は `amplify.yml` で定義している。
+1. バックエンドは `npm ci` のあと `npx ampx pipeline-deploy` を実行する
+2. フロントエンドは `npm run build` を実行し、`dist/` を配信する
 
-環境変数はAmplifyコンソールで設定:
-- `VITE_MS_CLIENT_ID`, `VITE_MS_AUTHORITY` - ビルド時にフロントに埋め込み
-- `CONFLUENCE_*` - デプロイ時にAgentCoreランタイムに注入
+環境変数はAmplifyコンソールで設定する。
+- `VITE_MS_CLIENT_ID`, `VITE_MS_AUTHORITY` はビルド時にフロントへ埋め込む
+- `CONFLUENCE_*` はデプロイ時にAgentCoreランタイムへ注入する
 
-GitHubへのpushで自動デプロイが実行される。
+GitHubへpushすると自動デプロイが実行される。
 
 ## 6. 外部API依存
 

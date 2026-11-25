@@ -43,7 +43,7 @@ npm install
 
 ### 2. 環境変数の設定
 
-`.env.local` を作成:
+`.env.local` を作成します。
 
 ```bash
 # Microsoft Entra ID（Entra のアプリ登録画面から取得）

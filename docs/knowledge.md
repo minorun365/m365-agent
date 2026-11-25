@@ -3,8 +3,8 @@
 ## 1. リージョンの一貫性が超重要
 
 ### 問題
-- AgentCore Runtime は `us-east-1` にデプロイ
-- しかし Strands Agent がデフォルトで `ap-northeast-1` の Bedrock を呼び出していた
+- AgentCore Runtime は `us-east-1` にデプロイしていた
+- しかし、Strands Agent はデフォルトで `ap-northeast-1` の Bedrock を呼び出していた
 - `us.` プレフィックスのモデルは米国リージョンでしか使えない
 
 ### 解決策
@@ -40,11 +40,11 @@ export async function ensureMsalInitialized() {
 ```
 
 ### トークン更新の順序
-1. `acquireTokenSilent` を試す（バックグラウンドで更新）
+1. `acquireTokenSilent` でバックグラウンド更新を試す
 2. 失敗したら `acquireTokenPopup` でユーザーに再ログインを促す
 
 ### セキュリティ
-- `sessionStorage` を使う（`localStorage` より安全）
+- `localStorage` より安全な `sessionStorage` を使う
 - トークンをログに出力しない
 
 ---
@@ -52,7 +52,7 @@ export async function ensureMsalInitialized() {
 ## 3. Graph API トークンの扱い
 
 ### LLM に見せない
-トークンを tool の引数にすると LLM が見える場所に置かれてしまう。
+トークンを tool の引数にすると、LLM から見える場所に置かれてしまう。
 closure で保持して HTTP ヘッダーにだけ付ける。
 
 ```python
@@ -72,8 +72,8 @@ def create_graph_tools(access_token: str, user_timezone: str):
 ## 4. Amplify Sandbox 開発フロー
 
 ### amplify_outputs.json がないとエラー
-- `npx ampx sandbox` 実行前はファイルが存在しない
-- デザイン確認だけしたい場合はダミーファイルを作成
+- `npx ampx sandbox` を実行する前はファイルが存在しない
+- デザイン確認だけしたい場合はダミーファイルを作成する
 
 ```json
 {
@@ -93,7 +93,7 @@ const SKIP_AUTH = true; // 開発時のみ
 
 ### AWS 認証切れに注意
 - Sandbox 実行中に AWS 認証が切れるとデプロイが失敗する
-- `aws login` で再認証後、Sandbox を再起動
+- `aws login` で再認証してから Sandbox を再起動する
 
 ---
 
@@ -113,15 +113,15 @@ aws logs get-log-events --region us-east-1 \
 ```
 
 ### フロントエンド
-- ブラウザの DevTools（F12）→ Console でエラー確認
-- Network タブで API リクエスト/レスポンスを確認
+- ブラウザの DevTools（F12）の Console でエラーを確認する
+- Network タブで API のリクエストとレスポンスを確認する
 
 ---
 
 ## 6. AgentCore Runtime 名の制約
 
 ### 問題
-Amplify Hosting デプロイ時に以下のエラー：
+Amplify Hosting のデプロイ時に以下のエラーが出た。
 ```
 Runtime name must start with a letter and contain only letters, numbers, and underscores
 ```
@@ -145,15 +145,15 @@ runtimeName = f"outlook_agent_{envId}"
 ## 7. LLM は曜日計算が苦手
 
 ### 問題
-「今週の予定は？」と聞くと、曜日がずれた回答が返ってきた
-- 例: 1/15 を「水曜日」と誤認（実際は木曜日）
+「今週の予定は？」と聞くと、曜日がずれた回答が返ってきた。
+- 例: 実際は木曜日の 1/15 を「水曜日」と誤認した
 
 ### 原因
 - システムプロンプトに ISO 8601 形式の日時を渡していた
 - LLM は日付から曜日を計算するのが苦手
 
 ### 解決策
-曜日情報を含むカスタムツールを追加：
+曜日情報を含むカスタムツールを追加する。
 ```python
 @tool
 def get_current_datetime() -> str:
@@ -165,7 +165,7 @@ def get_current_datetime() -> str:
     return f"現在日時: {now.strftime('%Y年%m月%d日')}（{weekday}）..."
 ```
 
-システムプロンプトにも指示を追加：
+システムプロンプトにも指示を追加する。
 ```
 - 「今日」「明日」「今週」などの相対表現を使う場合は、
   必ず get_current_datetime ツールで現在日時を確認してから処理してください
@@ -177,7 +177,7 @@ def get_current_datetime() -> str:
 ## 8. Redirect URI の末尾スラッシュ問題
 
 ### 問題
-Amplify Hosting で認証エラー：
+Amplify Hosting で以下の認証エラーが出た。
 ```
 invalid_request: The provided value for the input parameter 'redirect_uri' is not valid.
 ```
@@ -187,7 +187,7 @@ invalid_request: The provided value for the input parameter 'redirect_uri' is no
 - Entra 登録: `https://main.xxx.amplifyapp.com/`（スラッシュあり）
 
 ### 解決策
-Entra の Redirect URI を**末尾スラッシュなし**で登録：
+Entra の Redirect URI を末尾スラッシュなしで登録する。
 ```
 https://main.xxxxxxxxxxxxxx.amplifyapp.com
 ```
@@ -224,16 +224,16 @@ const handleToggleOutlook = async () => {
 
 ## 10. 今後の改善候補
 
-1. **リージョンを環境変数化**
+1. リージョンの環境変数化
    - フロント・バックで共通のリージョン設定を使う
 
-2. **エラーハンドリング強化**
-   - Graph API のエラーをユーザーにわかりやすく表示
-   - トークン期限切れ時の自動再取得
+2. エラーハンドリングの強化
+   - Graph API のエラーをユーザーにわかりやすく表示する
+   - トークン期限切れ時に自動で再取得する
 
-3. **本番化に向けて**
-   - Graph Token をフロントから渡すのをやめる（AgentCore Identity の Outbound Auth を使う）
-   - 環境変数を Amplify コンソールで管理
+3. 本番化に向けて
+   - AgentCore Identity の Outbound Auth を使い、Graph Token をフロントから渡すのをやめる
+   - 環境変数を Amplify コンソールで管理する
 
 ---
 
@@ -242,13 +242,13 @@ const handleToggleOutlook = async () => {
 ## 11. Confluence API 認証の落とし穴
 
 ### 問題
-Confluence APIを叩くと以下のエラー：
+Confluence API を叩くと以下のエラーが出た。
 ```
 Current user not permitted to use Confluence
 ```
 
 ### 原因
-**APIキー**と**APIトークン**を混同していた。
+APIキーとAPIトークンを混同していた。
 
 | 種類 | 用途 | 発行場所 |
 |------|------|----------|
@@ -256,21 +256,21 @@ Current user not permitted to use Confluence
 | API Token | REST API認証用 | id.atlassian.com |
 
 ### 解決策
-1. https://id.atlassian.com/manage-profile/security/api-tokens にアクセス
-2. 「Create API token」で新規発行
-3. 環境変数 `CONFLUENCE_API_TOKEN` に設定
+1. https://id.atlassian.com/manage-profile/security/api-tokens にアクセスする
+2. 「Create API token」で新規発行する
+3. 環境変数 `CONFLUENCE_API_TOKEN` に設定する
 
 ### 教訓
 - Atlassian の「API Key」は組織管理者向けの機能
 - REST API には必ず「API Token」を使う
-- エラーメッセージが「permission denied」的なものだが、実際は認証情報の種類が違う
+- エラーメッセージは「permission denied」的なものだが、実際は認証情報の種類が違う
 
 ---
 
 ## 12. CDK で AgentCore Runtime に環境変数を渡す
 
 ### 方法
-`@aws-cdk/aws-bedrock-agentcore-alpha` の `Runtime` コンストラクトには `environmentVariables` プロパティがある：
+`@aws-cdk/aws-bedrock-agentcore-alpha` の `Runtime` コンストラクトには `environmentVariables` プロパティがある。
 
 ```typescript
 const runtime = new agentcore.Runtime(stack, 'MyRuntime', {
@@ -290,7 +290,7 @@ export $(cat .env.local | grep CONFLUENCE | xargs) && npx ampx sandbox
 ```
 
 ### 本番デプロイ時
-Amplify コンソール → アプリ → 環境変数 で設定
+Amplify コンソール → アプリ → 環境変数 で設定する。
 
 ---
 
@@ -306,10 +306,10 @@ aws amplify update-app --app-id xxx \
 ```
 
 ### 原因
-`--environment-variables` は**追加**ではなく**置換**される。
+`--environment-variables` を指定すると、追加ではなく**置換**される。
 
 ### 解決策
-既存の環境変数も含めて、すべて一度に指定する：
+既存の環境変数も含めて、すべて一度に指定する。
 
 ```bash
 aws amplify update-app --app-id xxxxxxxxxxxxxx --region us-east-1 \
@@ -322,16 +322,16 @@ aws amplify update-app --app-id xxxxxxxxxxxxxx --region us-east-1 \
 ```
 
 ### 教訓
-- 環境変数を追加する前に `aws amplify get-app` で現在の値を確認
+- 環境変数を追加する前に `aws amplify get-app` で現在の値を確認する
 - 更新時は必ず全変数を含める
-- 消えた場合は再ビルドが必要（`aws amplify start-job`）
+- 消えた場合は `aws amplify start-job` で再ビルドが必要
 
 ---
 
 ## 環境情報（参考）
 
-- **Entra App Client ID**: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
-- **Entra Tenant ID**: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
-- **Bedrock Model**: `us.anthropic.claude-sonnet-4-5-20250929-v1:0`
-- **AgentCore Region**: `us-east-1`
-- **Confluence URL**: `https://your-domain.atlassian.net`
+- Entra App Client ID: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+- Entra Tenant ID: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+- Bedrock Model: `us.anthropic.claude-sonnet-4-5-20250929-v1:0`
+- AgentCore Region: `us-east-1`
+- Confluence URL: `https://your-domain.atlassian.net`
